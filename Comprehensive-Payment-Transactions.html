@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Transactions - Course Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#8E6FF7',secondary:'#F3F0FF'},borderRadius:{'none':'0px','sm':'2px',DEFAULT:'4px','md':'8px','lg':'12px','xl':'16px','2xl':'20px','3xl':'24px','full':'9999px','button':'4px'}}}}</script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Inter', sans-serif;
+background-color: #f9fafb;
+}
+.sidebar-expanded {
+width: 250px;
+transition: width 0.3s ease;
+}
+.sidebar-collapsed {
+width: 64px;
+transition: width 0.3s ease;
+}
+.main-content-expanded {
+margin-left: 250px;
+transition: margin-left 0.3s ease;
+}
+.main-content-collapsed {
+margin-left: 64px;
+transition: margin-left 0.3s ease;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+input[type="number"] {
+-moz-appearance: textfield;
+}
+.custom-checkbox {
+position: relative;
+display: inline-block;
+width: 18px;
+height: 18px;
+border-radius: 4px;
+border: 2px solid #d1d5db;
+background-color: white;
+cursor: pointer;
+}
+.custom-checkbox.checked {
+background-color: #8E6FF7;
+border-color: #8E6FF7;
+}
+.custom-checkbox.checked::after {
+content: '';
+position: absolute;
+top: 2px;
+left: 5px;
+width: 5px;
+height: 9px;
+border: solid white;
+border-width: 0 2px 2px 0;
+transform: rotate(45deg);
+}
+.custom-switch {
+position: relative;
+display: inline-block;
+width: 40px;
+height: 20px;
+}
+.custom-switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.switch-slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #e5e7eb;
+transition: .4s;
+border-radius: 34px;
+}
+.switch-slider:before {
+position: absolute;
+content: "";
+height: 16px;
+width: 16px;
+left: 2px;
+bottom: 2px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+input:checked + .switch-slider {
+background-color: #8E6FF7;
+}
+input:checked + .switch-slider:before {
+transform: translateX(20px);
+}
+.custom-range {
+-webkit-appearance: none;
+width: 100%;
+height: 4px;
+border-radius: 5px;
+background: #e5e7eb;
+outline: none;
+}
+.custom-range::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 16px;
+height: 16px;
+border-radius: 50%;
+background: #8E6FF7;
+cursor: pointer;
+}
+.custom-range::-moz-range-thumb {
+width: 16px;
+height: 16px;
+border-radius: 50%;
+background: #8E6FF7;
+cursor: pointer;
+border: none;
+}
+.date-picker {
+position: relative;
+}
+.date-picker-dropdown {
+position: absolute;
+top: 100%;
+left: 0;
+z-index: 10;
+width: 300px;
+background-color: white;
+border-radius: 8px;
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+.date-picker-calendar {
+padding: 16px;
+}
+.date-picker-calendar-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 12px;
+}
+.date-picker-calendar-days {
+display: grid;
+grid-template-columns: repeat(7, 1fr);
+gap: 4px;
+}
+.date-picker-calendar-day {
+display: flex;
+justify-content: center;
+align-items: center;
+height: 32px;
+width: 32px;
+border-radius: 50%;
+cursor: pointer;
+}
+.date-picker-calendar-day:hover {
+background-color: #F3F0FF;
+}
+.date-picker-calendar-day.selected {
+background-color: #8E6FF7;
+color: white;
+}
+.date-picker-calendar-day.disabled {
+color: #D1D5DB;
+cursor: not-allowed;
+}
+.filter-tag {
+display: inline-flex;
+align-items: center;
+padding: 4px 8px;
+background-color: #F3F0FF;
+border-radius: 16px;
+margin-right: 8px;
+margin-bottom: 8px;
+}
+.filter-tag-text {
+font-size: 12px;
+color: #8E6FF7;
+margin-right: 4px;
+}
+.filter-tag-close {
+display: flex;
+align-items: center;
+justify-content: center;
+width: 16px;
+height: 16px;
+border-radius: 50%;
+background-color: #8E6FF7;
+color: white;
+cursor: pointer;
+}
+</style>
+</head>
+<body class="min-h-screen">
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm z-50 flex items-center justify-between px-4">
+<div class="flex items-center">
+<div class="flex items-center mr-8">
+<span class="text-2xl font-['Pacifico'] text-primary">logo</span>
+<span class="ml-2 font-semibold text-gray-800">Admin</span>
+</div>
+<div class="relative hidden md:block">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center text-gray-500">
+<i class="ri-search-line"></i>
+</div>
+</div>
+<input type="text" class="block w-80 py-2 pl-10 pr-3 bg-gray-50 border-none rounded-md text-sm text-gray-900 focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="Search courses, instructors, or students">
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="relative">
+<button id="notificationButton" class="relative w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded-full">
+<i class="ri-notification-3-line ri-lg"></i>
+<span id="notificationBadge" class="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-red-500 text-white text-xs rounded-full">4</span>
+</button>
+<div id="notificationDropdown" class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg py-2 hidden z-50">
+<div class="px-4 py-2 border-b border-gray-100">
+<div class="flex items-center justify-between">
+<h3 class="text-sm font-semibold text-gray-900">Notifications</h3>
+<span class="text-xs text-primary">4 unread</span>
+</div>
+</div>
+<div class="max-h-96 overflow-y-auto">
+<div class="notification-item px-4 py-3 hover:bg-gray-50 border-l-4 border-primary cursor-pointer">
+<div class="flex items-start">
+<div class="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary rounded-full flex-shrink-0">
+<i class="ri-money-dollar-circle-line"></i>
+</div>
+<div class="ml-3 flex-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-gray-900">Payment Successful</p>
+<button class="mark-as-read w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600">
+<i class="ri-check-line"></i>
+</button>
+</div>
+<p class="text-sm text-gray-500 mt-1">Payment for "Advanced JavaScript" course has been processed successfully.</p>
+<p class="text-xs text-gray-400 mt-1">2 minutes ago</p>
+</div>
+</div>
+</div>
+<div class="notification-item px-4 py-3 hover:bg-gray-50 border-l-4 border-amber-500 cursor-pointer">
+<div class="flex items-start">
+<div class="w-8 h-8 flex items-center justify-center bg-amber-50 text-amber-500 rounded-full flex-shrink-0">
+<i class="ri-error-warning-line"></i>
+</div>
+<div class="ml-3 flex-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-gray-900">System Alert</p>
+<button class="mark-as-read w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600">
+<i class="ri-check-line"></i>
+</button>
+</div>
+<p class="text-sm text-gray-500 mt-1">Server maintenance scheduled for May 2, 2025, at 2:00 AM UTC.</p>
+<p class="text-xs text-gray-400 mt-1">15 minutes ago</p>
+</div>
+</div>
+</div>
+<div class="notification-item px-4 py-3 hover:bg-gray-50 border-l-4 border-green-500 cursor-pointer">
+<div class="flex items-start">
+<div class="w-8 h-8 flex items-center justify-center bg-green-50 text-green-500 rounded-full flex-shrink-0">
+<i class="ri-user-add-line"></i>
+</div>
+<div class="ml-3 flex-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-gray-900">New Enrollment</p>
+<button class="mark-as-read w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600">
+<i class="ri-check-line"></i>
+</button>
+</div>
+<p class="text-sm text-gray-500 mt-1">Maria Rodriguez has enrolled in "Digital Marketing Strategy" course.</p>
+<p class="text-xs text-gray-400 mt-1">1 hour ago</p>
+</div>
+</div>
+</div>
+<div class="notification-item px-4 py-3 hover:bg-gray-50 border-l-4 border-blue-500 cursor-pointer">
+<div class="flex items-start">
+<div class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-500 rounded-full flex-shrink-0">
+<i class="ri-feedback-line"></i>
+</div>
+<div class="ml-3 flex-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-gray-900">New Course Review</p>
+<button class="mark-as-read w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600">
+<i class="ri-check-line"></i>
+</button>
+</div>
+<p class="text-sm text-gray-500 mt-1">New 5-star review received for "Advanced JavaScript" course.</p>
+<p class="text-xs text-gray-400 mt-1">2 hours ago</p>
+</div>
+</div>
+</div>
+</div>
+<div class="px-4 py-2 border-t border-gray-100">
+<button id="markAllAsRead" class="w-full px-3 py-2 bg-gray-50 text-sm text-gray-700 rounded-md hover:bg-gray-100 mb-2">Mark all as read</button>
+<a href="#" class="block text-center text-sm text-primary hover:text-primary-dark">View all notifications</a>
+</div>
+</div>
+</div>
+<div class="relative">
+<button id="profileButton" class="flex items-center space-x-2 focus:outline-none">
+<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520a%2520young%2520business%2520man%2520with%2520short%2520hair%2520wearing%2520a%2520suit%252C%2520high%2520quality%252C%2520studio%2520lighting%252C%2520professional%2520headshot&width=200&height=200&seq=123&orientation=squarish" alt="Admin" class="w-full h-full object-cover">
+</div>
+<span class="hidden md:block text-sm font-medium text-gray-700">Alexander Wright</span>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden z-10">
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Profile</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Account Settings</a>
+<div class="border-t border-gray-100"></div>
+<a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sign Out</a>
+</div>
+</div>
+</div>
+</header>
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed top-16 left-0 bottom-0 bg-white shadow-sm sidebar-expanded z-40 overflow-y-auto">
+<nav class="pt-4 pb-16">
+<ul>
+<li>
+<a href="https://readdy.ai/home/896ed73a-45f2-4b02-b0e5-ee0e9647cd0a/a6ce509f-e9d0-40eb-a998-22e4f1693cc0" data-readdy="true" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 font-medium">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-dashboard-line"></i>
+</div>
+<span class="sidebar-text">Dashboard</span>
+</a>
+</li>
+<li>
+<a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 font-medium">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-book-open-line"></i>
+</div>
+<span class="sidebar-text">Courses</span>
+</a>
+</li>
+<li>
+<button id="instructorsDropdown" class="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-gray-50 font-medium">
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-user-star-line"></i>
+</div>
+<span class="sidebar-text">Instructors</span>
+</div>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<ul id="instructorsSubmenu" class="hidden pl-12 py-1 bg-gray-50">
+<li>
+<a href="#" class="block py-2 text-sm text-gray-700 hover:text-primary">Verified</a>
+</li>
+<li>
+<a href="#" class="block py-2 text-sm text-gray-700 hover:text-primary">Non-Verified</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 font-medium">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-user-line"></i>
+</div>
+<span class="sidebar-text">Students</span>
+</a>
+</li>
+<li>
+<a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 font-medium">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-calendar-line"></i>
+</div>
+<span class="sidebar-text">Session Calendar</span>
+</a>
+</li>
+<li>
+<a href="#" class="flex items-center px-4 py-3 text-primary bg-primary/10 font-medium">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-bank-card-line"></i>
+</div>
+<span class="sidebar-text">Payments</span>
+</a>
+</li>
+<li>
+<a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 font-medium">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-ai-generate"></i>
+</div>
+<span class="sidebar-text">AI Analytics</span>
+</a>
+</li>
+<li>
+<a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 font-medium">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-refresh-line"></i>
+</div>
+<span class="sidebar-text">Subscriptions</span>
+</a>
+</li>
+<li>
+<a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 font-medium">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-settings-line"></i>
+</div>
+<span class="sidebar-text">Settings</span>
+</a>
+</li>
+</ul>
+</nav>
+<button id="sidebarToggle" class="absolute bottom-4 left-0 right-0 mx-auto w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200">
+<i id="toggleIcon" class="ri-arrow-left-s-line"></i>
+</button>
+</aside>
+<!-- Main Content -->
+<main id="mainContent" class="pt-16 main-content-expanded pb-8">
+<div class="p-6">
+<!-- Breadcrumb -->
+<div class="flex items-center text-sm text-gray-500 mb-4">
+<a href="https://readdy.ai/home/896ed73a-45f2-4b02-b0e5-ee0e9647cd0a/a6ce509f-e9d0-40eb-a998-22e4f1693cc0" data-readdy="true" class="hover:text-primary">Dashboard</a>
+<div class="w-4 h-4 flex items-center justify-center mx-1">
+<i class="ri-arrow-right-s-line"></i>
+</div>
+<span class="text-gray-700 font-medium">Payments</span>
+</div>
+<!-- Page Header -->
+<div class="mb-6 flex items-center justify-between">
+<div class="flex items-center">
+<a href="https://readdy.ai/home/896ed73a-45f2-4b02-b0e5-ee0e9647cd0a/a6ce509f-e9d0-40eb-a998-22e4f1693cc0" data-readdy="true" class="mr-3 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200">
+<i class="ri-arrow-left-s-line"></i>
+</a>
+<h1 class="text-2xl font-bold text-gray-900">Payment Transactions</h1>
+</div>
+<div class="flex items-center space-x-3">
+<div class="flex items-center space-x-2">
+<span class="text-sm text-gray-500">May 1, 2025</span>
+<div class="w-5 h-5 flex items-center justify-center text-gray-500">
+<i class="ri-calendar-line"></i>
+</div>
+</div>
+<button class="px-4 py-2 bg-primary text-white rounded-button flex items-center !rounded-button whitespace-nowrap">
+<div class="w-5 h-5 flex items-center justify-center mr-1">
+<i class="ri-add-line"></i>
+</div>
+<span>New Transaction</span>
+</button>
+</div>
+</div>
+<!-- Filter and Search Section -->
+<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+<div class="relative w-full md:w-96 mb-4 md:mb-0">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center text-gray-500">
+<i class="ri-search-line"></i>
+</div>
+</div>
+<input type="text" class="block w-full py-2 pl-10 pr-3 bg-gray-50 border-none rounded-md text-sm text-gray-900 focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="Search by ID, student, or course">
+</div>
+<div class="flex items-center space-x-2">
+<button id="filterButton" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-button flex items-center !rounded-button whitespace-nowrap">
+<div class="w-5 h-5 flex items-center justify-center mr-1">
+<i class="ri-filter-3-line"></i>
+</div>
+<span>Filters</span>
+</button>
+<div class="relative">
+<button id="exportButton" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-button flex items-center !rounded-button whitespace-nowrap">
+<div class="w-5 h-5 flex items-center justify-center mr-1">
+<i class="ri-download-line"></i>
+</div>
+<span>Export</span>
+<div class="w-5 h-5 flex items-center justify-center ml-1">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div id="exportDropdown" class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 hidden z-10">
+<a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+<div class="w-5 h-5 flex items-center justify-center mr-2 text-gray-500">
+<i class="ri-file-excel-line"></i>
+</div>
+<span>Excel</span>
+</a>
+<a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+<div class="w-5 h-5 flex items-center justify-center mr-2 text-gray-500">
+<i class="ri-file-pdf-line"></i>
+</div>
+<span>PDF</span>
+</a>
+<a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+<div class="w-5 h-5 flex items-center justify-center mr-2 text-gray-500">
+<i class="ri-file-text-line"></i>
+</div>
+<span>CSV</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Advanced Filters (Hidden by default) -->
+<div id="advancedFilters" class="hidden border-t border-gray-100 pt-4 mt-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Date Range -->
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+<div class="flex items-center space-x-2">
+<div class="relative flex-1">
+<input type="text" id="startDate" class="block w-full py-2 px-3 bg-gray-50 border-none rounded-md text-sm text-gray-900 focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="Start Date" readonly>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center text-gray-500">
+<i class="ri-calendar-line"></i>
+</div>
+</div>
+</div>
+<span class="text-gray-500">to</span>
+<div class="relative flex-1">
+<input type="text" id="endDate" class="block w-full py-2 px-3 bg-gray-50 border-none rounded-md text-sm text-gray-900 focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="End Date" readonly>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center text-gray-500">
+<i class="ri-calendar-line"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Payment Status -->
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
+<div class="relative">
+<select class="block w-full py-2 pl-3 pr-10 bg-gray-50 border-none rounded-md text-sm text-gray-900 focus:ring-2 focus:ring-primary/20 focus:outline-none appearance-none">
+<option value="">All Statuses</option>
+<option value="completed">Completed</option>
+<option value="pending">Pending</option>
+<option value="failed">Failed</option>
+<option value="refunded">Refunded</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center text-gray-500">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</div>
+</div>
+</div>
+<!-- Amount Range -->
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Amount Range</label>
+<div class="flex items-center space-x-2">
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+<span class="text-gray-500">$</span>
+</div>
+<input type="number" class="block w-full py-2 pl-8 pr-3 bg-gray-50 border-none rounded-md text-sm text-gray-900 focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="Min">
+</div>
+<span class="text-gray-500">to</span>
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+<span class="text-gray-500">$</span>
+</div>
+<input type="number" class="block w-full py-2 pl-8 pr-3 bg-gray-50 border-none rounded-md text-sm text-gray-900 focus:ring-2 focus:ring-primary/20 focus:outline-none" placeholder="Max">
+</div>
+</div>
+</div>
+<!-- Course Category -->
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Course Category</label>
+<div class="relative">
+<select class="block w-full py-2 pl-3 pr-10 bg-gray-50 border-none rounded-md text-sm text-gray-900 focus:ring-2 focus:ring-primary/20 focus:outline-none appearance-none">
+<option value="">All Categories</option>
+<option value="web-development">Web Development</option>
+<option value="data-science">Data Science</option>
+<option value="ui-ux">UI/UX Design</option>
+<option value="marketing">Digital Marketing</option>
+<option value="ai-ml">AI & Machine Learning</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center text-gray-500">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-4">
+<div>
+<button id="applyFilters" class="px-4 py-2 bg-primary text-white rounded-button !rounded-button whitespace-nowrap">Apply Filters</button>
+<button id="resetFilters" class="px-4 py-2 text-gray-700 rounded-button !rounded-button whitespace-nowrap">Reset</button>
+</div>
+<button id="closeFilters" class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+</div>
+<!-- Active Filters -->
+<div id="activeFilters" class="mt-4">
+<div class="flex flex-wrap">
+<div class="filter-tag">
+<span class="filter-tag-text">Date: Apr 15 - May 1</span>
+<div class="filter-tag-close">
+<i class="ri-close-line text-xs"></i>
+</div>
+</div>
+<div class="filter-tag">
+<span class="filter-tag-text">Status: Completed</span>
+<div class="filter-tag-close">
+<i class="ri-close-line text-xs"></i>
+</div>
+</div>
+<div class="filter-tag">
+<span class="filter-tag-text">Category: Web Development</span>
+<div class="filter-tag-close">
+<i class="ri-close-line text-xs"></i>
+</div>
+</div>
+<button id="clearAllFilters" class="text-sm text-primary hover:text-primary-dark">Clear All</button>
+</div>
+</div>
+</div>
+<!-- Bulk Actions and Transaction Summary -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+<div class="flex items-center mb-4 md:mb-0">
+<div class="custom-checkbox" id="selectAllCheckbox"></div>
+<div class="relative ml-2">
+<button id="bulkActionsButton" class="flex items-center text-sm text-gray-700 hover:text-gray-900">
+<span>Bulk Actions</span>
+<div class="w-5 h-5 flex items-center justify-center ml-1">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div id="bulkActionsDropdown" class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden z-10">
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mark as Complete</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Process Refund</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Export Selected</a>
+</div>
+</div>
+<span class="ml-4 text-sm text-gray-500">5 items selected</span>
+</div>
+<div class="flex items-center space-x-4">
+<span class="text-sm text-gray-500">Showing <span class="font-medium">1-25</span> of <span class="font-medium">256</span> transactions</span>
+<div class="relative">
+<button id="perPageButton" class="flex items-center text-sm text-gray-700 hover:text-gray-900">
+<span>25 per page</span>
+<div class="w-5 h-5 flex items-center justify-center ml-1">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div id="perPageDropdown" class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 hidden z-10">
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">10 per page</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">25 per page</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">50 per page</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">100 per page</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Transactions Table -->
+<div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-gray-200">
+<thead class="bg-gray-50">
+<tr>
+<th scope="col" class="px-4 py-3 text-left">
+<div class="custom-checkbox" id="tableSelectAllCheckbox"></div>
+</th>
+<th scope="col" class="px-4 py-3 text-left">
+<div class="flex items-center">
+<span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction ID</span>
+<button class="ml-1 text-gray-400 hover:text-gray-500">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-up-s-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th scope="col" class="px-4 py-3 text-left">
+<div class="flex items-center">
+<span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</span>
+<button class="ml-1 text-gray-400 hover:text-gray-500">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th scope="col" class="px-4 py-3 text-left">
+<div class="flex items-center">
+<span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Course</span>
+<button class="ml-1 text-gray-400 hover:text-gray-500">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-up-down-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th scope="col" class="px-4 py-3 text-left">
+<div class="flex items-center">
+<span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Student</span>
+<button class="ml-1 text-gray-400 hover:text-gray-500">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-up-down-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th scope="col" class="px-4 py-3 text-left">
+<div class="flex items-center">
+<span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</span>
+<button class="ml-1 text-gray-400 hover:text-gray-500">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-up-down-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th scope="col" class="px-4 py-3 text-left">
+<div class="flex items-center">
+<span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Status</span>
+<button class="ml-1 text-gray-400 hover:text-gray-500">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-up-down-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th scope="col" class="px-4 py-3 text-right">
+<span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</span>
+</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-200">
+<tr class="hover:bg-gray-50 cursor-pointer transaction-row" data-id="TRX-8792">
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="custom-checkbox checked"></div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">#TRX-8792</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-500">May 1, 2025</div>
+<div class="text-xs text-gray-400">10:32 AM</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm text-gray-900">Advanced JavaScript</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 mr-2 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520a%2520young%2520woman%2520with%2520blonde%2520hair%252C%2520casual%2520professional%2520attire%252C%2520neutral%2520background&width=100&height=100&seq=128&orientation=squarish" alt="Jessica Parker" class="w-full h-full object-cover">
+</div>
+<div>
+<div class="text-sm font-medium text-gray-900">Jessica Parker</div>
+<div class="text-xs text-gray-500">jessica.p@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">$129.00</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Completed</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap text-right">
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 cursor-pointer transaction-row" data-id="TRX-8791">
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="custom-checkbox checked"></div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">#TRX-8791</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-500">May 1, 2025</div>
+<div class="text-xs text-gray-400">09:18 AM</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm text-gray-900">UI/UX Design Principles</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 mr-2 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520a%2520young%2520man%2520with%2520short%2520dark%2520hair%252C%2520casual%2520attire%252C%2520neutral%2520background&width=100&height=100&seq=129&orientation=squarish" alt="Thomas Anderson" class="w-full h-full object-cover">
+</div>
+<div>
+<div class="text-sm font-medium text-gray-900">Thomas Anderson</div>
+<div class="text-xs text-gray-500">t.anderson@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">$149.00</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Completed</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap text-right">
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 cursor-pointer transaction-row" data-id="TRX-8790">
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="custom-checkbox checked"></div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">#TRX-8790</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-500">Apr 30, 2025</div>
+<div class="text-xs text-gray-400">04:45 PM</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm text-gray-900">Data Science Fundamentals</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 mr-2 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520a%2520middle-aged%2520man%2520with%2520glasses%252C%2520business%2520casual%2520attire%252C%2520neutral%2520background&width=100&height=100&seq=130&orientation=squarish" alt="James Wilson" class="w-full h-full object-cover">
+</div>
+<div>
+<div class="text-sm font-medium text-gray-900">James Wilson</div>
+<div class="text-xs text-gray-500">j.wilson@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">$199.00</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">Pending</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap text-right">
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 cursor-pointer transaction-row" data-id="TRX-8789">
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="custom-checkbox checked"></div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">#TRX-8789</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-500">Apr 30, 2025</div>
+<div class="text-xs text-gray-400">02:15 PM</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm text-gray-900">Digital Marketing Strategy</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 mr-2 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520a%2520young%2520woman%2520with%2520dark%2520hair%252C%2520professional%2520attire%252C%2520neutral%2520background&width=100&height=100&seq=131&orientation=squarish" alt="Maria Rodriguez" class="w-full h-full object-cover">
+</div>
+<div>
+<div class="text-sm font-medium text-gray-900">Maria Rodriguez</div>
+<div class="text-xs text-gray-500">m.rodriguez@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">$149.00</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Completed</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap text-right">
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 cursor-pointer transaction-row" data-id="TRX-8788">
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="custom-checkbox checked"></div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">#TRX-8788</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-500">Apr 30, 2025</div>
+<div class="text-xs text-gray-400">11:30 AM</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm text-gray-900">AI & Machine Learning</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 mr-2 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520a%2520young%2520man%2520with%2520glasses%2520and%2520short%2520beard%252C%2520casual%2520professional%2520attire%252C%2520neutral%2520background&width=100&height=100&seq=132&orientation=squarish" alt="Daniel Kim" class="w-full h-full object-cover">
+</div>
+<div>
+<div class="text-sm font-medium text-gray-900">Daniel Kim</div>
+<div class="text-xs text-gray-500">d.kim@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">$249.00</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Completed</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap text-right">
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 cursor-pointer transaction-row" data-id="TRX-8787">
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="custom-checkbox"></div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">#TRX-8787</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-500">Apr 29, 2025</div>
+<div class="text-xs text-gray-400">05:42 PM</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm text-gray-900">Web Development Bootcamp</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 mr-2 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520a%2520young%2520woman%2520with%2520red%2520hair%252C%2520casual%2520professional%2520attire%252C%2520neutral%2520background&width=100&height=100&seq=133&orientation=squarish" alt="Emma Thompson" class="w-full h-full object-cover">
+</div>
+<div>
+<div class="text-sm font-medium text-gray-900">Emma Thompson</div>
+<div class="text-xs text-gray-500">e.thompson@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">$299.00</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Failed</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap text-right">
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 cursor-pointer transaction-row" data-id="TRX-8786">
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="custom-checkbox"></div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">#TRX-8786</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-500">Apr 29, 2025</div>
+<div class="text-xs text-gray-400">03:15 PM</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm text-gray-900">Python for Data Analysis</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 mr-2 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520an%2520older%2520man%2520with%2520gray%2520hair%252C%2520business%2520attire%252C%2520neutral%2520background&width=100&height=100&seq=134&orientation=squarish" alt="Richard Davis" class="w-full h-full object-cover">
+</div>
+<div>
+<div class="text-sm font-medium text-gray-900">Richard Davis</div>
+<div class="text-xs text-gray-500">r.davis@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">$179.00</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Completed</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap text-right">
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 cursor-pointer transaction-row" data-id="TRX-8785">
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="custom-checkbox"></div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">#TRX-8785</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-500">Apr 29, 2025</div>
+<div class="text-xs text-gray-400">01:20 PM</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm text-gray-900">Mobile App Development</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 mr-2 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520a%2520young%2520woman%2520with%2520brown%2520hair%2520and%2520glasses%252C%2520casual%2520professional%2520attire%252C%2520neutral%2520background&width=100&height=100&seq=135&orientation=squarish" alt="Olivia Martinez" class="w-full h-full object-cover">
+</div>
+<div>
+<div class="text-sm font-medium text-gray-900">Olivia Martinez</div>
+<div class="text-xs text-gray-500">o.martinez@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">$199.00</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">Pending</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap text-right">
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 cursor-pointer transaction-row" data-id="TRX-8784">
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="custom-checkbox"></div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">#TRX-8784</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-500">Apr 28, 2025</div>
+<div class="text-xs text-gray-400">04:55 PM</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm text-gray-900">Graphic Design Masterclass</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 mr-2 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520a%2520young%2520man%2520with%2520curly%2520hair%252C%2520casual%2520professional%2520attire%252C%2520neutral%2520background&width=100&height=100&seq=136&orientation=squarish" alt="Noah Williams" class="w-full h-full object-cover">
+</div>
+<div>
+<div class="text-sm font-medium text-gray-900">Noah Williams</div>
+<div class="text-xs text-gray-500">n.williams@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">$169.00</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">Refunded</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap text-right">
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 cursor-pointer transaction-row" data-id="TRX-8783">
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="custom-checkbox"></div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">#TRX-8783</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-500">Apr 28, 2025</div>
+<div class="text-xs text-gray-400">02:10 PM</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm text-gray-900">Content Marketing Essentials</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 mr-2 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520a%2520middle-aged%2520woman%2520with%2520short%2520hair%252C%2520business%2520attire%252C%2520neutral%2520background&width=100&height=100&seq=137&orientation=squarish" alt="Sophia Johnson" class="w-full h-full object-cover">
+</div>
+<div>
+<div class="text-sm font-medium text-gray-900">Sophia Johnson</div>
+<div class="text-xs text-gray-500">s.johnson@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="text-sm font-medium text-gray-900">$129.00</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap">
+<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Completed</span>
+</td>
+<td class="px-4 py-4 whitespace-nowrap text-right">
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Pagination -->
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-500 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-left-s-line"></i>
+</div>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-primary text-white mx-1">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 mx-1">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 mx-1">3</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 mx-1">4</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 mx-1">5</button>
+<span class="mx-1 text-gray-500">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 mx-1">11</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-500 hover:bg-gray-200 ml-1">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-right-s-line"></i>
+</div>
+</button>
+</div>
+<div class="hidden md:block text-sm text-gray-500">
+Showing page 1 of 11
+</div>
+</div>
+</div>
+</main>
+<!-- Transaction Details Modal -->
+<div id="transactionModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+<div class="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+<div class="p-6 border-b border-gray-200">
+<div class="flex items-center justify-between">
+<h3 class="text-xl font-bold text-gray-900">Transaction Details</h3>
+<button id="closeModal" class="text-gray-500 hover:text-gray-700">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+</div>
+<div class="p-6">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Transaction Info -->
+<div class="md:col-span-2">
+<div class="mb-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">Transaction Information</h4>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-sm text-gray-500">Transaction ID</p>
+<p class="text-sm font-medium text-gray-900">#TRX-8792</p>
+</div>
+<div>
+<p class="text-sm text-gray-500">Date & Time</p>
+<p class="text-sm font-medium text-gray-900">May 1, 2025, 10:32 AM</p>
+</div>
+<div>
+<p class="text-sm text-gray-500">Payment Method</p>
+<div class="flex items-center">
+<div class="w-5 h-5 flex items-center justify-center text-blue-500 mr-1">
+<i class="ri-visa-fill"></i>
+</div>
+<p class="text-sm font-medium text-gray-900">Visa ending in 4242</p>
+</div>
+</div>
+<div>
+<p class="text-sm text-gray-500">Status</p>
+<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Completed</span>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">Course Information</h4>
+<div class="flex items-start">
+<div class="w-16 h-16 rounded-md bg-gray-200 flex-shrink-0 mr-4 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=javascript%2520programming%2520code%2520on%2520computer%2520screen%252C%2520modern%2520web%2520development%252C%2520clean%2520code%2520example&width=200&height=200&seq=138&orientation=squarish" alt="Advanced JavaScript" class="w-full h-full object-cover">
+</div>
+<div>
+<h5 class="text-base font-medium text-gray-900">Advanced JavaScript</h5>
+<p class="text-sm text-gray-500 mt-1">Master modern JavaScript concepts and techniques for professional web development</p>
+<div class="flex items-center mt-2">
+<div class="flex items-center mr-4">
+<div class="w-4 h-4 flex items-center justify-center text-gray-500 mr-1">
+<i class="ri-user-star-line"></i>
+</div>
+<span class="text-xs text-gray-500">Emily Johnson</span>
+</div>
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center text-gray-500 mr-1">
+<i class="ri-time-line"></i>
+</div>
+<span class="text-xs text-gray-500">12 weeks</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<h4 class="text-lg font-semibold text-gray-900 mb-4">Transaction History</h4>
+<div class="border border-gray-200 rounded-md overflow-hidden">
+<div class="bg-gray-50 px-4 py-2">
+<div class="grid grid-cols-3 gap-4">
+<div class="text-xs font-medium text-gray-500">Date & Time</div>
+<div class="text-xs font-medium text-gray-500">Action</div>
+<div class="text-xs font-medium text-gray-500">Status</div>
+</div>
+</div>
+<div class="divide-y divide-gray-200">
+<div class="px-4 py-3">
+<div class="grid grid-cols-3 gap-4">
+<div class="text-sm text-gray-900">May 1, 2025, 10:32 AM</div>
+<div class="text-sm text-gray-900">Payment processed</div>
+<div><span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Completed</span></div>
+</div>
+</div>
+<div class="px-4 py-3">
+<div class="grid grid-cols-3 gap-4">
+<div class="text-sm text-gray-900">May 1, 2025, 10:30 AM</div>
+<div class="text-sm text-gray-900">Payment initiated</div>
+<div><span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Processing</span></div>
+</div>
+</div>
+<div class="px-4 py-3">
+<div class="grid grid-cols-3 gap-4">
+<div class="text-sm text-gray-900">May 1, 2025, 10:28 AM</div>
+<div class="text-sm text-gray-900">Course added to cart</div>
+<div><span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">Info</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Student Info -->
+<div>
+<div class="bg-gray-50 rounded-lg p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">Student Information</h4>
+<div class="flex items-center mb-4">
+<div class="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0 mr-4 overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=professional%2520portrait%2520of%2520a%2520young%2520woman%2520with%2520blonde%2520hair%252C%2520casual%2520professional%2520attire%252C%2520neutral%2520background&width=100&height=100&seq=128&orientation=squarish" alt="Jessica Parker" class="w-full h-full object-cover">
+</div>
+<div>
+<h5 class="text-base font-medium text-gray-900">Jessica Parker</h5>
+<p class="text-sm text-gray-500">Student ID: STU-4521</p>
+</div>
+</div>
+<div class="space-y-3">
+<div>
+<p class="text-sm text-gray-500">Email</p>
+<p class="text-sm font-medium text-gray-900">jessica.p@example.com</p>
+</div>
+<div>
+<p class="text-sm text-gray-500">Phone</p>
+<p class="text-sm font-medium text-gray-900">+1 (555) 123-4567</p>
+</div>
+<div>
+<p class="text-sm text-gray-500">Location</p>
+<p class="text-sm font-medium text-gray-900">San Francisco, CA, USA</p>
+</div>
+<div>
+<p class="text-sm text-gray-500">Enrolled Courses</p>
+<p class="text-sm font-medium text-gray-900">3 Active Courses</p>
+</div>
+<div>
+<p class="text-sm text-gray-500">Total Spent</p>
+<p class="text-sm font-medium text-gray-900">$427.00</p>
+</div>
+</div>
+<div class="mt-6">
+<button class="w-full px-4 py-2 bg-primary text-white rounded-button flex items-center justify-center !rounded-button whitespace-nowrap">
+<div class="w-5 h-5 flex items-center justify-center mr-1">
+<i class="ri-user-line"></i>
+</div>
+<span>View Student Profile</span>
+</button>
+</div>
+</div>
+<div class="mt-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">Payment Details</h4>
+<div class="bg-gray-50 rounded-lg p-6">
+<div class="flex justify-between items-center mb-3">
+<span class="text-sm text-gray-500">Course Price</span>
+<span class="text-sm font-medium text-gray-900">$149.00</span>
+</div>
+<div class="flex justify-between items-center mb-3">
+<span class="text-sm text-gray-500">Discount (15%)</span>
+<span class="text-sm font-medium text-red-600">-$22.35</span>
+</div>
+<div class="flex justify-between items-center mb-3">
+<span class="text-sm text-gray-500">Tax (2%)</span>
+<span class="text-sm font-medium text-gray-900">$2.53</span>
+</div>
+<div class="border-t border-gray-200 my-3"></div>
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium text-gray-900">Total</span>
+<span class="text-base font-bold text-gray-900">$129.18</span>
+</div>
+</div>
+<div class="mt-4 flex space-x-2">
+<button class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-button flex items-center justify-center !rounded-button whitespace-nowrap">
+<div class="w-4 h-4 flex items-center justify-center mr-1">
+<i class="ri-file-text-line"></i>
+</div>
+<span>Invoice</span>
+</button>
+<button class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-button flex items-center justify-center !rounded-button whitespace-nowrap">
+<div class="w-4 h-4 flex items-center justify-center mr-1">
+<i class="ri-refund-2-line"></i>
+</div>
+<span>Refund</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// Notification Dropdown Toggle
+const notificationButton = document.getElementById('notificationButton');
+const notificationDropdown = document.getElementById('notificationDropdown');
+const notificationBadge = document.getElementById('notificationBadge');
+const markAllAsRead = document.getElementById('markAllAsRead');
+const markAsReadButtons = document.querySelectorAll('.mark-as-read');
+let unreadCount = 4;
+
+notificationButton.addEventListener('click', function(e) {
+e.stopPropagation();
+notificationDropdown.classList.toggle('hidden');
+});
+
+document.addEventListener('click', function(event) {
+if (!notificationButton.contains(event.target) && !notificationDropdown.contains(event.target)) {
+notificationDropdown.classList.add('hidden');
+}
+});
+
+markAsReadButtons.forEach(button => {
+button.addEventListener('click', function(e) {
+e.stopPropagation();
+const notificationItem = this.closest('.notification-item');
+notificationItem.style.opacity = '0.5';
+notificationItem.style.borderLeftColor = '#E5E7EB';
+unreadCount--;
+if (unreadCount <= 0) {
+notificationBadge.classList.add('hidden');
+} else {
+notificationBadge.textContent = unreadCount;
+}
+});
+});
+
+markAllAsRead.addEventListener('click', function(e) {
+e.stopPropagation();
+document.querySelectorAll('.notification-item').forEach(item => {
+item.style.opacity = '0.5';
+item.style.borderLeftColor = '#E5E7EB';
+});
+notificationBadge.classList.add('hidden');
+unreadCount = 0;
+});
+
+// Profile Dropdown Toggle
+const profileButton = document.getElementById('profileButton');
+const profileDropdown = document.getElementById('profileDropdown');
+profileButton.addEventListener('click', function() {
+profileDropdown.classList.toggle('hidden');
+});
+document.addEventListener('click', function(event) {
+if (!profileButton.contains(event.target) && !profileDropdown.contains(event.target)) {
+profileDropdown.classList.add('hidden');
+}
+});
+// Instructors Dropdown Toggle
+const instructorsDropdown = document.getElementById('instructorsDropdown');
+const instructorsSubmenu = document.getElementById('instructorsSubmenu');
+instructorsDropdown.addEventListener('click', function() {
+instructorsSubmenu.classList.toggle('hidden');
+});
+});
+document.addEventListener('DOMContentLoaded', function() {
+// Sidebar Toggle
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('mainContent');
+const toggleIcon = document.getElementById('toggleIcon');
+const sidebarTexts = document.querySelectorAll('.sidebar-text');
+sidebarToggle.addEventListener('click', function() {
+if (sidebar.classList.contains('sidebar-expanded')) {
+sidebar.classList.remove('sidebar-expanded');
+sidebar.classList.add('sidebar-collapsed');
+mainContent.classList.remove('main-content-expanded');
+mainContent.classList.add('main-content-collapsed');
+toggleIcon.classList.remove('ri-arrow-left-s-line');
+toggleIcon.classList.add('ri-arrow-right-s-line');
+sidebarTexts.forEach(text => {
+text.style.display = 'none';
+});
+} else {
+sidebar.classList.remove('sidebar-collapsed');
+sidebar.classList.add('sidebar-expanded');
+mainContent.classList.remove('main-content-collapsed');
+mainContent.classList.add('main-content-expanded');
+toggleIcon.classList.remove('ri-arrow-right-s-line');
+toggleIcon.classList.add('ri-arrow-left-s-line');
+sidebarTexts.forEach(text => {
+text.style.display = 'inline';
+});
+}
+});
+});
+document.addEventListener('DOMContentLoaded', function() {
+// Filter Button Toggle
+const filterButton = document.getElementById('filterButton');
+const advancedFilters = document.getElementById('advancedFilters');
+const closeFilters = document.getElementById('closeFilters');
+filterButton.addEventListener('click', function() {
+advancedFilters.classList.toggle('hidden');
+});
+closeFilters.addEventListener('click', function() {
+advancedFilters.classList.add('hidden');
+});
+// Export Dropdown Toggle
+const exportButton = document.getElementById('exportButton');
+const exportDropdown = document.getElementById('exportDropdown');
+exportButton.addEventListener('click', function() {
+exportDropdown.classList.toggle('hidden');
+});
+document.addEventListener('click', function(event) {
+if (!exportButton.contains(event.target) && !exportDropdown.contains(event.target)) {
+exportDropdown.classList.add('hidden');
+}
+});
+// Bulk Actions Dropdown Toggle
+const bulkActionsButton = document.getElementById('bulkActionsButton');
+const bulkActionsDropdown = document.getElementById('bulkActionsDropdown');
+bulkActionsButton.addEventListener('click', function() {
+bulkActionsDropdown.classList.toggle('hidden');
+});
+document.addEventListener('click', function(event) {
+if (!bulkActionsButton.contains(event.target) && !bulkActionsDropdown.contains(event.target)) {
+bulkActionsDropdown.classList.add('hidden');
+}
+});
+// Per Page Dropdown Toggle
+const perPageButton = document.getElementById('perPageButton');
+const perPageDropdown = document.getElementById('perPageDropdown');
+perPageButton.addEventListener('click', function() {
+perPageDropdown.classList.toggle('hidden');
+});
+document.addEventListener('click', function(event) {
+if (!perPageButton.contains(event.target) && !perPageDropdown.contains(event.target)) {
+perPageDropdown.classList.add('hidden');
+}
+});
+// Checkbox Toggle
+const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+const tableSelectAllCheckbox = document.getElementById('tableSelectAllCheckbox');
+const checkboxes = document.querySelectorAll('.custom-checkbox:not(#selectAllCheckbox):not(#tableSelectAllCheckbox)');
+function toggleCheckbox(checkbox) {
+checkbox.classList.toggle('checked');
+}
+selectAllCheckbox.addEventListener('click', function() {
+toggleCheckbox(this);
+const isChecked = this.classList.contains('checked');
+tableSelectAllCheckbox.classList.toggle('checked', isChecked);
+checkboxes.forEach(checkbox => {
+checkbox.classList.toggle('checked', isChecked);
+});
+});
+tableSelectAllCheckbox.addEventListener('click', function() {
+toggleCheckbox(this);
+const isChecked = this.classList.contains('checked');
+selectAllCheckbox.classList.toggle('checked', isChecked);
+checkboxes.forEach(checkbox => {
+checkbox.classList.toggle('checked', isChecked);
+});
+});
+checkboxes.forEach(checkbox => {
+checkbox.addEventListener('click', function() {
+toggleCheckbox(this);
+});
+});
+// Transaction Row Click
+const transactionRows = document.querySelectorAll('.transaction-row');
+const transactionModal = document.getElementById('transactionModal');
+const closeModal = document.getElementById('closeModal');
+transactionRows.forEach(row => {
+row.addEventListener('click', function(event) {
+// Don't open modal if clicking on checkbox
+if (event.target.closest('.custom-checkbox') || event.target.closest('button')) {
+return;
+}
+transactionModal.classList.remove('hidden');
+document.body.style.overflow = 'hidden';
+});
+});
+closeModal.addEventListener('click', function() {
+transactionModal.classList.add('hidden');
+document.body.style.overflow = 'auto';
+});
+// Close modal when clicking outside
+transactionModal.addEventListener('click', function(event) {
+if (event.target === transactionModal) {
+transactionModal.classList.add('hidden');
+document.body.style.overflow = 'auto';
+}
+});
+// Filter Tags
+const filterTags = document.querySelectorAll('.filter-tag-close');
+const clearAllFilters = document.getElementById('clearAllFilters');
+filterTags.forEach(tag => {
+tag.addEventListener('click', function() {
+this.closest('.filter-tag').remove();
+});
+});
+clearAllFilters.addEventListener('click', function() {
+document.querySelectorAll('.filter-tag').forEach(tag => {
+tag.remove();
+});
+});
+// Date Picker Functionality
+const startDateInput = document.getElementById('startDate');
+const endDateInput = document.getElementById('endDate');
+if (startDateInput && endDateInput) {
+startDateInput.addEventListener('click', function() {
+// Date picker functionality would be implemented here
+console.log('Open start date picker');
+});
+endDateInput.addEventListener('click', function() {
+// Date picker functionality would be implemented here
+console.log('Open end date picker');
+});
+}
+// Apply Filters
+const applyFilters = document.getElementById('applyFilters');
+const resetFilters = document.getElementById('resetFilters');
+if (applyFilters && resetFilters) {
+applyFilters.addEventListener('click', function() {
+advancedFilters.classList.add('hidden');
+// Apply filter logic would be implemented here
+console.log('Filters applied');
+});
+resetFilters.addEventListener('click', function() {
+// Reset filter logic would be implemented here
+console.log('Filters reset');
+});
+}
+});
+</script>
+</body>
+</html>
